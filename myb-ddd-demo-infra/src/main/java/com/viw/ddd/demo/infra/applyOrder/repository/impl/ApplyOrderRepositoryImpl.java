@@ -104,6 +104,7 @@ public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
     /**
      * DO → Entity 转换
      * 职责：将持久化对象转为领域对象（读数据库后用）
+     * 可以做convert包里面增加bean的映射，使用mapping注解就可以了，
      */
     private ApplyOrderEntity toEntity(ApplyOrderDO doObj) {
         if (doObj == null) return null;

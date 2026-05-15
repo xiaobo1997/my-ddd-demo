@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 /**
  * 【DDD - 应用层（Application）· 应用服务实现】
  *
- * 应用服务是典型的"编排"角色：
+ * 应用服务典型是的"编排"角色：
  *   1. submitApplyOrder: 查询公司 → 构造实体 → 保存 → 发事件
  *   2. sendExpress:    查询实体 → 快照(old) → 执行业务 → 对比更新 → 发事件
  *
