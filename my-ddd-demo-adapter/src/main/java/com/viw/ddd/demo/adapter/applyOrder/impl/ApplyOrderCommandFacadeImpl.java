@@ -3,30 +3,45 @@ package com.viw.ddd.demo.adapter.applyOrder.impl;
 import com.viw.ddd.demo.api.applyOrder.ApplyOrderCommandFacade;
 import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
 import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
+import com.viw.ddd.demo.app.applyOrder.assembler.ApplyOrderAssembler;
+import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * 【DDD - 适配层（Adapter）· 门面实现】
+ * 【DDD - 适配层（Adapter）· 命令门面实现 + 防腐层入口】
  *
- * Adapter 层是 DDD 中负责"适配"的层：
- *   1. 实现 API 层定义的接口（Facade）
- *   2. 将外部请求（HTTP/RPC）转译为应用层可理解的调用
- *   3. 负责参数校验、结果包装等接入层逻辑
+ * 职责：
+ *   1. 实现 api 层的 ApplyOrderCommandFacade
+ *   2. 防腐处理：通过 ApplyOrderAssembler（MapStruct）将 api 的 Command 转为 app 的 DTO
+ *   3. 转调应用层服务
  *
- * 典型流程：Controller 请求 → FacadeImpl → ApplicationService → Domain
- * 
- * 注意：本层不包含业务逻辑，只做"转译"
+ * 防腐设计关键：
+ *   Command（外部契约）→ [Assembler 映射] → DTO（内部模型）→ Service
+ *   上游改字段 → 只影响 Command + Assembler，Service 不受影响
  *
  * @author xhb
  */
+@Component
 public class ApplyOrderCommandFacadeImpl implements ApplyOrderCommandFacade {
 
-    private ApplyOrderService applyOrderService;
+    private final ApplyOrderAssembler assembler;
+    private final ApplyOrderService applyOrderService;
+
+    @Autowired
+    public ApplyOrderCommandFacadeImpl(ApplyOrderAssembler assembler,
+                                        ApplyOrderService applyOrderService) {
+        this.assembler = assembler;
+        this.applyOrderService = applyOrderService;
+    }
 
     @Override
     public Long submitApplyOrder(SubmitApplyOrderCommand command) {
-        // 转译：API 层的 Command 直接传递给应用层
-        return applyOrderService.submitApplyOrder(command);
+        // 防腐：Command → DTO
+        SubmitApplyOrderDTO dto = assembler.toDTO(command);
+        // 转调应用层服务
+        return applyOrderService.submitApplyOrder(dto);
     }
 
     @Override

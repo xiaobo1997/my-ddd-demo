@@ -1,6 +1,6 @@
 package com.viw.ddd.demo.app.applyOrder.factory;
 
-import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
+import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 
 import java.math.BigDecimal;
@@ -25,17 +25,17 @@ public class ApplyOrderFactory {
      * 从 Command 创建申请单实体
      * 流程：接收 Command 数据 → builder 填充 → 调用实体的 create() 初始化
      */
-    public static ApplyOrderEntity createApplyOrder(SubmitApplyOrderCommand command) {
+    public static ApplyOrderEntity createApplyOrder(SubmitApplyOrderDTO dto) {
         ApplyOrderEntity entity = ApplyOrderEntity.builder()
-                .companyId(command.getCompanyId())
-                .invoiceHeader(command.getInvoiceHeader())
-                .subject(command.getSubject())
-                .applyAmount(command.getApplyAmount())
-                .freightFee(command.getFreightFee())
-                .serviceFee(command.getServiceFee())
-                .totalAmount(calculateTotal(command))
-                .applyOrderDetailVOList(command.getApplyOrderDetailVOList())
-                .applyOrderExpressVO(command.getApplyOrderExpressVO())
+                .companyId(dto.getCompanyId())
+                .invoiceHeader(dto.getInvoiceHeader())
+                .subject(dto.getSubject())
+                .applyAmount(dto.getApplyAmount())
+                .freightFee(dto.getFreightFee())
+                .serviceFee(dto.getServiceFee())
+                .totalAmount(calculateTotal(dto))
+                .applyOrderDetailVOList(dto.getApplyOrderDetailVOList())
+                .applyOrderExpressVO(dto.getApplyOrderExpressVO())
                 .build();
         // 调用实体的 create() 初始化状态、申请单号、申请日期
         entity.create();
@@ -67,10 +67,10 @@ public class ApplyOrderFactory {
     /**
      * 计算总金额 = 申请金额 + 运费 + 服务费
      */
-    private static BigDecimal calculateTotal(SubmitApplyOrderCommand command) {
-        BigDecimal amount = nullToZero(command.getApplyAmount());
-        BigDecimal freight = nullToZero(command.getFreightFee());
-        BigDecimal service = nullToZero(command.getServiceFee());
+    private static BigDecimal calculateTotal(SubmitApplyOrderDTO dto) {
+        BigDecimal amount = nullToZero(dto.getApplyAmount());
+        BigDecimal freight = nullToZero(dto.getFreightFee());
+        BigDecimal service = nullToZero(dto.getServiceFee());
         return amount.add(freight).add(service);
     }
 

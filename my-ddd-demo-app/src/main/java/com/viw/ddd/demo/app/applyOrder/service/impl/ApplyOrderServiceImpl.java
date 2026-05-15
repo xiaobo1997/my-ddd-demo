@@ -2,8 +2,8 @@ package com.viw.ddd.demo.app.applyOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
-import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
 import com.viw.ddd.demo.app.applyOrder.convert.ApplyOrderConvert;
+import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.app.applyOrder.factory.ApplyOrderFactory;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
@@ -17,17 +17,13 @@ import org.springframework.stereotype.Service;
 /**
  * 【DDD - 应用层（Application）· 应用服务实现】
  *
- * 应用服务典型是的"编排"角色：
+ * 应用服务是典型的"编排"角色：
  *   1. submitApplyOrder: 查询公司 → 构造实体 → 保存 → 发事件
  *   2. sendExpress:    查询实体 → 快照(old) → 执行业务 → 对比更新 → 发事件
  *
- * 典型模式：取出聚合根 → 调用聚合根方法 → 保存聚合根
- * 这是 DDD 中"事务脚本"在应用层的表现，真正的业务逻辑在实体内部。
- *
- * DDD 依赖方向（已修复）：
- *   ✅ 只依赖 domain 层接口（CompanyGateway、MqSender、ApplyOrderRepository）
- *   ✅ 不依赖 infra 层实现 —— 通过构造函数注入，Spring 自动装配
- *   ✅ 依赖倒置：app → domain(接口) ← infra(实现)
+ * 防腐设计：
+ *   接收的是 app 层 DTO（已由适配层的 Assembler 从 api Command 转换过来）
+ *   不直接依赖 api 层的 Command，上游字段变更不影响本方法
  *
  * @author xhb
  */
@@ -39,14 +35,6 @@ public class ApplyOrderServiceImpl implements ApplyOrderService {
     private final MqSender mqSender;
     private final ApplyOrderConvert applyOrderConvert;
 
-    /**
-     * 构造函数注入（推荐方式，优于 @Autowired 字段注入）
-     * Spring 会自动从容器中查找对应实现：
-     *   - ApplyOrderRepository → ApplyOrderRepositoryImpl (@Repository)
-     *   - CompanyGateway → CompanyGatewayImpl (@Component)
-     *   - MqSender → MqSenderImpl (@Component)
-     *   - ApplyOrderConvert → ApplyOrderConvertImpl (@Component)
-     */
     @Autowired
     public ApplyOrderServiceImpl(ApplyOrderRepository applyOrderRepository,
                                   CompanyGateway companyGateway,
@@ -59,12 +47,12 @@ public class ApplyOrderServiceImpl implements ApplyOrderService {
     }
 
     @Override
-    public Long submitApplyOrder(SubmitApplyOrderCommand submitApplyOrderCommand) {
+    public Long submitApplyOrder(SubmitApplyOrderDTO dto) {
         // 1. 通过 Gateway 远程查询公司信息
-        CompanyDTO companyDTO = companyGateway.findByCompanyId(submitApplyOrderCommand.getCompanyId());
+        CompanyDTO companyDTO = companyGateway.findByCompanyId(dto.getCompanyId());
 
         // 2. 通过 Factory 创建聚合根
-        ApplyOrderEntity applyOrder = ApplyOrderFactory.createApplyOrder(submitApplyOrderCommand);
+        ApplyOrderEntity applyOrder = ApplyOrderFactory.createApplyOrder(dto);
 
         // 3. 通过 Repository 持久化聚合根
         Long id = applyOrderRepository.save(applyOrder);
@@ -81,7 +69,7 @@ public class ApplyOrderServiceImpl implements ApplyOrderService {
         // 1. 查询聚合根
         ApplyOrderEntity applyOrderEntity = applyOrderRepository.findById(sendExpressCommand.getApplyOrderId());
 
-        // 2. 快照旧实体（用于后续对比变更，类似 Hibernate 的快照机制）
+        // 2. 快照旧实体（用于后续对比变更）
         ApplyOrderEntity oldApplyOrderEntity = ApplyOrderFactory.clone(applyOrderEntity);
 
         // 3. 调用聚合根的领域方法
