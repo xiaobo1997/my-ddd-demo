@@ -177,11 +177,11 @@ DRAFT → EXPRESSED → APPROVED → CREATE_BATCH
 
 ---
 
-### 5. 基础设施层 (Infra) — `myb-ddd-demo-infra`
+### 5. 基础设施层 (Infra) — `my-ddd-demo-infra`
 
 **定位**：纯技术实现层。数据库访问、RPC 调用、MQ 发送都在这里。
 
-**代码位置**：`myb-ddd-demo-infra/src/main/java/com/viw/ddd/demo/infra/`
+**代码位置**：`my-ddd-demo-infra/src/main/java/com/viw/ddd/demo/infra/`
 
 **关键文件**：
 

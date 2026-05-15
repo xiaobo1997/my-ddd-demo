@@ -13,7 +13,7 @@
         <module>my-ddd-demo-api</module>
         <module>my-ddd-demo-app</module>
         <module>my-ddd-demo-domain</module>
-        <module>myb-ddd-demo-infra</module>
+        <module>my-ddd-demo-infra</module>
         <module>my-ddd-demo-start</module>
         <module>my-ddd-demo-common</module>
     </modules>
@@ -55,7 +55,7 @@
             </dependency>
             <dependency>
                 <groupId>com.viw</groupId>
-                <artifactId>myb-ddd-demo-infra</artifactId>
+                <artifactId>my-ddd-demo-infra</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -7,7 +7,7 @@ This is a Java 8 multi-module Maven project rooted at `pom.xml`. Source code fol
 - `my-ddd-demo-api`: public command facade contracts and DTOs.
 - `my-ddd-demo-app`: application services, factories, converters, and published events.
 - `my-ddd-demo-domain`: domain entities, value objects, and repository interfaces.
-- `myb-ddd-demo-infra`: infrastructure implementations, gateways, persistence DOs, and MQ utilities.
+- `my-ddd-demo-infra`: infrastructure implementations, gateways, persistence DOs, and MQ utilities.
 - `my-ddd-demo-adapter`: adapter implementations that bridge API contracts to application services.
 - `my-ddd-demo-start`: startup/assembly module.
 
@@ -50,7 +50,7 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 | domain | my-ddd-demo-domain | 4 | lombok | ApplyOrderEntity, ApplyOrderRepository (接口), ApplyOrderDetailVO, ApplyOrderExpressVO |
 | app | my-ddd-demo-app | 6 | api, domain, infra, fastjson | ApplyOrderService (接口+Impl), ApplyOrderFactory, ApplyOrderConvert (接口), ApplyOrderSubmittedEvent, ExpressSentEvent |
 | adapter | my-ddd-demo-adapter | 1 | api, app | ApplyOrderCommandFacadeImpl |
-| infra | myb-ddd-demo-infra | 6 | domain | ApplyOrderRepositoryImpl, CompanyGateway (接口+Impl), CompanyDTO, MqSender (接口+Impl) |
+| infra | my-ddd-demo-infra | 6 | domain | ApplyOrderRepositoryImpl, CompanyGateway (接口+Impl), CompanyDTO, MqSender (接口+Impl) |
 | start | my-ddd-demo-start | 1 | (none) | Main.java (空骨架) |
 
 ## 2. Skeleton Analysis
@@ -79,13 +79,13 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 **① Package 名称拼写错误：`domin` → `domain`** ✅ 已修复
 - 9 个 Java 文件 + 文档已完成重命名
 
-**② Module 命名不一致：`myb-ddd-demo-infra`**
+**② Module 命名不一致：`my-ddd-demo-infra`**
 - 其他模块：`my-ddd-demo-api/app/adapter/domain/start`
-- infra 模块：`myb-ddd-demo-infra`（多了一个 b）
+- infra 模块：`my-ddd-demo-infra`（多了一个 b）
 - 影响：pom.xml 中 `<module>` 和所有依赖声明都要改，工作量较大
 
 **③ App 层直接依赖 Infra 层（违反 DDD 规范）**
-- `app/pom.xml` 直接引入了 `myb-ddd-demo-infra` 依赖
+- `app/pom.xml` 直接引入了 `my-ddd-demo-infra` 依赖
 - `ApplyOrderServiceImpl` 直接 import `CompanyGateway` 和 `MqSender`（都在 infra 包下）
 - 正确做法：在 domain 层定义 Gateway 接口，infra 层实现，app 层只依赖 domain 接口
 - `CompanyGateway` 接口应移到 domain 层
@@ -130,7 +130,7 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 - [ ] 将 `CompanyGateway` 接口从 infra 层移到 domain 层
 - [ ] 移除 app 层对 infra 层的直接依赖，改为通过 domain 接口
 - [ ] 添加 DI 框架（Spring 注解或构造函数注入）
-- [ ] 修复 `myb-ddd-demo-infra` → `my-ddd-demo-infra`（可选，但建议统一下）
+- [ ] 修复 `my-ddd-demo-infra` → `my-ddd-demo-infra`（可选，但建议统一下）
 
 ### P3 — 完善与测试
 - [ ] 实现 `ApplyOrderCommandFacadeImpl` — 桥接 API → App 层

@@ -18,7 +18,7 @@
 | **my-ddd-demo-adapter** | 适配层 | 外部入口适配：Controller / 定时任务 / 回调 / MQ消费者 / 异常处理 | `*FacadeImpl`, `*Scheduler`, `*CallbackController`, `*EventConsumer`, `GlobalExceptionHandler` |
 | **my-ddd-demo-app** | 应用层 | 流程编排 + 防腐层：Service / Factory / Convert / Assembler | `ApplyOrderServiceImpl`, `ApplyOrderQueryServiceImpl`, `*Assembler` (MapStruct), `*Factory` |
 | **my-ddd-demo-domain** | 领域层 | 核心：Entity / VO / Repository接口 / Gateway接口 | `ApplyOrderEntity`, `ApplyOrderDetailVO`, `*Repository`, `*Gateway` |
-| **myb-ddd-demo-infra** | 基础设施层 | 技术实现：Repository实现 / Gateway实现 / MQ实现 / DO | `ApplyOrderRepositoryImpl`, `*GatewayImpl`, `*DO`, `ApplyOrderDataAssembler` |
+| **my-ddd-demo-infra** | 基础设施层 | 技术实现：Repository实现 / Gateway实现 / MQ实现 / DO | `ApplyOrderRepositoryImpl`, `*GatewayImpl`, `*DO`, `ApplyOrderDataAssembler` |
 | **my-ddd-demo-common** | 通用模块 | 跨层共用：异常 / 枚举 / 基础DTO | `BusinessException`, `ApplyOrderStatusEnum`, `Result<T>`, `PageResult<T>` |
 | **my-ddd-demo-start** | 启动模块 | 组装+启动：Spring Boot 启动类 | `Main` |
 
