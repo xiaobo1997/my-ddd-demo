@@ -1,71 +1,94 @@
 # my-ddd-demo
 
-基于领域驱动设计（DDD）的多模块 Java 工程脚手架，使用 Java 8 + Maven 构建。
+基于领域驱动设计（DDD）的多模块 Java 工程**教学脚手架**，使用 Java 8 + Maven 构建。
 
-## 项目结构
+## 🎯 项目目标
+
+**展示一个完整的 DDD 工程模板长什么样。** 每个类都用注释注明：
+
+- 这个类属于 DDD 的**哪一层**（API/Application/Domain/Infrastructure/Adapter）
+- 它在 DDD 中扮演的**角色**是什么（聚合根/值对象/仓储/工厂/应用服务/转换器等）
+- 它和相邻组件如何**协作**
+
+让没接触过 DDD 的程序员一看就能理解分层结构和职责划分。
+
+## 🏗 模块结构（DDD 经典四层架构）
 
 ```
-my-ddd-demo/
-├── my-ddd-demo-api/          # 对外接口层 — 定义 Command 门面契约和 DTO
-├── my-ddd-demo-app/          # 应用服务层 — 编排业务流程、工厂、转换器、事件
-├── my-ddd-demo-domain/       # 领域层 — 核心业务实体、值对象、仓储接口
-├── my-ddd-demo-adapter/      # 适配层 — 实现 API 门面，桥接外部请求到应用服务
-├── myb-ddd-demo-infra/       # 基础设施层 — 持久化实现、远程 RPC 网关、MQ 发送
-├── my-ddd-demo-start/        # 启动模块 — 应用入口、配置
-├── pom.xml                   # 父 POM，模块管理与依赖版本控制
-└── AGENTS.md                 # AI 辅助开发指南
+┌─────────────────────────────────────┐
+│  api 接口层                          │
+│  ApplyOrderCommandFacade (门面接口)   │
+│  SubmitApplyOrderCommand (命令对象)    │
+├─────────────────────────────────────┤
+│  adapter 适配层                      │
+│  ApplyOrderCommandFacadeImpl (实现)   │
+├─────────────────────────────────────┤
+│  app 应用层                          │
+│  ApplyOrderService (应用服务)         │
+│  ApplyOrderFactory (工厂)            │
+│  ApplyOrderConvert (转换器)          │
+│  *SubmittedEvent / *SentEvent (事件) │
+├─────────────────────────────────────┤
+│  domain 领域层 (核心)                 │
+│  ApplyOrderEntity (聚合根 + 业务方法) │
+│  ApplyOrderRepository (仓储接口)      │
+│  ApplyOrderDetailVO / ExpressVO (值对象)│
+├─────────────────────────────────────┤
+│  infra 基础设施层                     │
+│  ApplyOrderRepositoryImpl (仓储实现)   │
+│  ApplyOrderDO / DetailDO / ExpressDO │
+│  CompanyGateway (外部网关)           │
+│  MqSender (消息发送器)               │
+└─────────────────────────────────────┘
 ```
 
-## 技术栈
+## 📖 核心 DDD 概念速览
+
+| 概念 | 本工程中的体现 | 说明 |
+|------|--------------|------|
+| **聚合根 (Aggregate Root)** | `ApplyOrderEntity` | 有唯一ID，聚合内的入口，保证数据一致性 |
+| **实体 (Entity)** | `ApplyOrderEntity` | 有唯一标识（id），状态可变 |
+| **值对象 (VO)** | `ApplyOrderDetailVO`, `ApplyOrderExpressVO` | 无唯一标识，描述性，依附于实体 |
+| **仓储 (Repository)** | `ApplyOrderRepository` | 聚合根的持久化抽象，接口在 domain，实现 infra |
+| **工厂 (Factory)** | `ApplyOrderFactory` | 封装复杂实体创建逻辑 |
+| **应用服务 (App Service)** | `ApplyOrderService` | 编排业务流程，不包含业务规则 |
+| **领域事件 (Domain Event)** | `*SubmittedEvent`, `*SentEvent` | 已发生的事情，通过 MQ 通知其他系统 |
+| **Gateway (网关)** | `CompanyGateway` | 封装对外部系统的调用 |
+| **数据对象 (DO)** | `*DO` | 与数据库表对应的持久化对象 |
+| **命令对象 (Command)** | `*Command` | 封装一次业务操作的输入参数 |
+
+## 🔄 一次完整的请求流程
+
+```
+submitApplyOrder(Command)
+     │
+     ▼
+ApplyOrderCommandFacadeImpl (Adapter)
+     │  透传 Command
+     ▼
+ApplyOrderServiceImpl (Application)
+     │  ├─ CompanyGateway.findByCompanyId() → 查外部公司信息
+     │  ├─ ApplyOrderFactory.createApplyOrder() → 创建聚合根
+     │  ├─ ApplyOrderRepository.save() → 持久化聚合根
+     │  └─ MqSender.send(Event) → 发布领域事件
+     ▼
+完成
+```
+
+## 🛠 技术栈
 
 - **Java 8** — 语言版本
 - **Maven** — 项目构建
 - **Lombok** — 简化 POJO
 - **Fastjson** — JSON 序列化
-- **DDD** — 领域驱动设计分层架构
+- **Spring Boot 2.7.18** — IoC 容器 + Web 支持（Java 8 兼容版本）
 
-## 业务上下文
-
-演示场景为**申请单（ApplyOrder）管理**，包含以下核心流程：
-
-1. **提交申请单** — 提交申请、校验公司信息、保存并发送事件
-2. **快递派送** — 录入快递单号、更新状态、发送事件
-3. **状态流转** — 创建→审批→开票→寄送的全生命周期
-
-## 快速开始
+## 🚀 快速开始
 
 ```bash
-# 编译所有模块
 mvn clean compile
-
-# 运行测试
-mvn clean test
-
-# 打包
-mvn clean package
 ```
-
-## 模块依赖关系
-
-```
-adapter → api + app
-app     → api + domain + infra
-domain  → (纯 POJO，无外部依赖)
-infra   → domain
-```
-
-> **注意**：当前 app 层直接依赖 infra 层（违反 DDD 规范），后续重构会将 Gateway 接口抽离到 domain 层。
-
-## TODO / 演进计划
-
-- [ ] 修复包名拼写错误（domain → domain）
-- [ ] 统一模块命名（myb → my）
-- [ ] 引入 Spring Boot 依赖与 IoC 容器
-- [ ] 补齐领域实体业务方法
-- [ ] 实现仓储层持久化逻辑
-- [ ] 添加单元测试与集成测试
-- [ ] 优化 DDD 架构分层合规性
 
 ---
 
-*项目脚手架生成，逐步演进中。*
+*DDD 教学脚手架，注释比代码更重要。*
