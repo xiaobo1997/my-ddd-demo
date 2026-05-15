@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>DDD 数据架构图 - my-ddd-demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #020617; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; padding: 40px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 24px; margin-bottom: 8px; }
+  .dot { display: inline-block; width: 10px; height: 10px; background: #a78bfa; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .subtitle { color: #94a3b8; font-size: 13px; }
+  .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 30px; margin-bottom: 24px; }
+  svg { width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1><span class="dot"></span>my-ddd-demo 数据架构图</h1>
+    <p class="subtitle">聚合根一致性 · Entity↔DO 映射 · 三表持久化</p>
+  </div>
+  <div class="card">
+    <svg viewBox="0 0 1100 750" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+        </pattern>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
+        </marker>
+        <marker id="arrow-v" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#a78bfa"/>
+        </marker>
+        <marker id="arrow-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#34d399"/>
+        </marker>
+      </defs>
+
+      <rect width="1100" height="750" fill="url(#grid)"/>
+
+      <text x="550" y="30" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="bold">数据架构 — 聚合根一致性持久化</text>
+
+      <!-- === LEFT: Domain Model === -->
+      <rect x="30" y="55" width="340" height="370" rx="8" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+      <rect x="30" y="55" width="340" height="370" rx="8" fill="rgba(76,29,149,0.08)"/>
+      <text x="200" y="78" text-anchor="middle" fill="#a78bfa" font-size="13">领域模型 (Domain)</text>
+
+      <!-- Aggregate Root -->
+      <rect x="50" y="95" width="300" height="130" rx="6" fill="rgba(76,29,149,0.3)" stroke="#a78bfa" stroke-width="1.5"/>
+      <text x="200" y="115" text-anchor="middle" fill="#e2e8f0" font-size="11">ApplyOrderEntity (聚合根)</text>
+      <text x="200" y="135" text-anchor="middle" fill="#94a3b8" font-size="9">━━━━━━━━ Flat Fields ━━━━━━━━</text>
+      <text x="200" y="152" text-anchor="middle" fill="#c4b5fd" font-size="9">id · applyOrderNo · invoiceHeader · subject</text>
+      <text x="200" y="167" text-anchor="middle" fill="#c4b5fd" font-size="9">applyAmount · freightFee · serviceFee · totalAmount</text>
+      <text x="200" y="182" text-anchor="middle" fill="#c4b5fd" font-size="9">applyDate · status (ApplyOrderStatusEnum)</text>
+      <text x="200" y="200" text-anchor="middle" fill="#94a3b8" font-size="8">━━ Value Objects ━━</text>
+      <text x="200" y="215" text-anchor="middle" fill="#c4b5fd" font-size="9">List&lt;ApplyOrderDetailVO&gt; · ApplyOrderExpressVO</text>
+
+      <!-- Detail VO -->
+      <rect x="50" y="240" width="140" height="80" rx="5" fill="rgba(76,29,149,0.2)" stroke="#a78bfa" stroke-width="1"/>
+      <text x="120" y="258" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderDetailVO</text>
+      <text x="120" y="274" text-anchor="middle" fill="#c4b5fd" font-size="8">deliveryAddress · receivingAddress</text>
+      <text x="120" y="288" text-anchor="middle" fill="#c4b5fd" font-size="8">freightFee · serviceFee</text>
+      <text x="120" y="302" text-anchor="middle" fill="#c4b5fd" font-size="8">taxCode · status</text>
+
+      <!-- Express VO -->
+      <rect x="210" y="240" width="140" height="80" rx="5" fill="rgba(76,29,149,0.2)" stroke="#a78bfa" stroke-width="1"/>
+      <text x="280" y="258" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderExpressVO</text>
+      <text x="280" y="274" text-anchor="middle" fill="#c4b5fd" font-size="8">recipient · contractPhone</text>
+      <text x="280" y="288" text-anchor="middle" fill="#c4b5fd" font-size="8">deliveryAddress · deliveryCompany</text>
+      <text x="280" y="302" text-anchor="middle" fill="#c4b5fd" font-size="8">expressNo</text>
+
+      <!-- Gateway DTO -->
+      <rect x="50" y="338" width="300" height="40" rx="5" fill="rgba(76,29,149,0.15)" stroke="#a78bfa" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="200" y="363" text-anchor="middle" fill="#94a3b8" font-size="9">CompanyDTO (Gateway 返回类型)</text>
+
+      <!-- === MIDDLE: MapStruct Assemblers === -->
+      <rect x="400" y="55" width="260" height="300" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+      <rect x="400" y="55" width="260" height="300" rx="8" fill="rgba(251,146,60,0.06)"/>
+      <text x="530" y="78" text-anchor="middle" fill="#fb923c" font-size="13">MapStruct 映射器</text>
+
+      <!-- App Assembler -->
+      <rect x="415" y="95" width="230" height="55" rx="5" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+      <text x="530" y="115" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderAssembler</text>
+      <text x="530" y="132" text-anchor="middle" fill="#94a3b8" font-size="8">Command → DTO (防腐)</text>
+      <text x="530" y="144" text-anchor="middle" fill="#34d399" font-size="7">@Mapper(componentModel="spring")</text>
+
+      <!-- Data Assembler -->
+      <rect x="415" y="165" width="230" height="45" rx="5" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1"/>
+      <text x="530" y="183" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderDataAssembler</text>
+      <text x="530" y="198" text-anchor="middle" fill="#94a3b8" font-size="8">Entity ↔ DO</text>
+
+      <!-- Detail Assembler -->
+      <rect x="415" y="222" width="230" height="45" rx="5" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1"/>
+      <text x="530" y="240" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderDetailAssembler</text>
+      <text x="530" y="255" text-anchor="middle" fill="#94a3b8" font-size="8">DetailVO ↔ DetailDO</text>
+
+      <!-- Express Assembler -->
+      <rect x="415" y="278" width="230" height="45" rx="5" fill="rgba(251,146,60,0.3)" stroke="#fb923c" stroke-width="1"/>
+      <text x="530" y="296" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderExpressAssembler</text>
+      <text x="530" y="311" text-anchor="middle" fill="#94a3b8" font-size="8">ExpressVO ↔ ExpressDO</text>
+
+      <!-- === RIGHT: Infra DOs === -->
+      <rect x="690" y="55" width="380" height="300" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+      <rect x="690" y="55" width="380" height="300" rx="8" fill="rgba(6,78,59,0.08)"/>
+      <text x="880" y="78" text-anchor="middle" fill="#34d399" font-size="13">数据对象 (Infra DO)</text>
+
+      <!-- ApplyOrderDO -->
+      <rect x="710" y="95" width="340" height="80" rx="5" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+      <text x="880" y="115" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderDO (主表)</text>
+      <text x="880" y="135" text-anchor="middle" fill="#6ee7b7" font-size="8">id · applyOrderNo · invoiceHeader · subject</text>
+      <text x="880" y="150" text-anchor="middle" fill="#6ee7b7" font-size="8">applyAmount · freightFee · serviceFee · totalAmount</text>
+      <text x="880" y="165" text-anchor="middle" fill="#6ee7b7" font-size="8">applyDate · status</text>
+
+      <!-- DetailDO -->
+      <rect x="710" y="188" width="340" height="70" rx="5" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+      <text x="880" y="208" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderDetailDO (明细表)</text>
+      <text x="880" y="225" text-anchor="middle" fill="#6ee7b7" font-size="8">id · applyOrderId (FK) · deliveryAddress · receivingAddress</text>
+      <text x="880" y="240" text-anchor="middle" fill="#6ee7b7" font-size="8">freightFee · serviceFee · taxCode · status</text>
+
+      <!-- ExpressDO -->
+      <rect x="710" y="270" width="340" height="55" rx="5" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+      <text x="880" y="290" text-anchor="middle" fill="#e2e8f0" font-size="10">ApplyOrderExpressDO (快递表)</text>
+      <text x="880" y="307" text-anchor="middle" fill="#6ee7b7" font-size="8">id · applyOrderId (FK) · recipient · expressNo · deliveryCompany</text>
+
+      <!-- === Arrows === -->
+
+      <!-- Command → App DTO -->
+      <path d="M 60 245 L 60 410" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arrow-g)"/>
+      <text x="15" y="340" fill="#34d399" font-size="7" transform="rotate(-90,15,340)">防腐映射</text>
+
+      <!-- Entity → DataAssembler -->
+      <line x1="350" y1="160" x2="413" y2="185" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- DetailVO → DetailAssembler -->
+      <line x1="190" y1="280" x2="413" y2="244" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- ExpressVO → ExpressAssembler -->
+      <line x1="350" y1="280" x2="413" y2="300" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- DataAssembler → ApplyOrderDO -->
+      <line x1="645" y1="187" x2="708" y2="135" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-g)"/>
+
+      <!-- DetailAssembler → DetailDO -->
+      <line x1="645" y1="244" x2="708" y2="223" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-g)"/>
+
+      <!-- ExpressAssembler → ExpressDO -->
+      <line x1="645" y1="300" x2="708" y2="297" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-g)"/>
+
+      <!-- === BOTTOM: Persistence Layer === -->
+      <rect x="30" y="450" width="1040" height="260" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+      <rect x="30" y="450" width="1040" height="260" rx="8" fill="rgba(251,146,60,0.05)"/>
+      <text x="550" y="478" text-anchor="middle" fill="#fb923c" font-size="14" font-weight="bold">ApplyOrderRepositoryImpl — 内存三表持久化</text>
+
+      <!-- Main DB -->
+      <rect x="55" y="498" width="300" height="100" rx="6" fill="rgba(251,146,60,0.2)" stroke="#fb923c" stroke-width="1"/>
+      <text x="205" y="522" text-anchor="middle" fill="#e2e8f0" font-size="11">db (主表)</text>
+      <text x="205" y="542" text-anchor="middle" fill="#fed7aa" font-size="9">ConcurrentHashMap&lt;Long, ApplyOrderDO&gt;</text>
+      <text x="205" y="558" text-anchor="middle" fill="#94a3b8" font-size="8">id → ApplyOrderDO</text>
+      <text x="205" y="574" text-anchor="middle" fill="#94a3b8" font-size="8">AtomicLong idGenerator</text>
+
+      <!-- Detail DB -->
+      <rect x="390" y="498" width="300" height="100" rx="6" fill="rgba(251,146,60,0.2)" stroke="#fb923c" stroke-width="1"/>
+      <text x="540" y="522" text-anchor="middle" fill="#e2e8f0" font-size="11">detailDb (明细表)</text>
+      <text x="540" y="542" text-anchor="middle" fill="#fed7aa" font-size="9">ConcurrentHashMap&lt;Long, ApplyOrderDetailDO&gt;</text>
+      <text x="540" y="558" text-anchor="middle" fill="#94a3b8" font-size="8">detailId → DetailDO (FK: applyOrderId)</text>
+      <text x="540" y="574" text-anchor="middle" fill="#94a3b8" font-size="8">AtomicLong detailIdGen</text>
+
+      <!-- Express DB -->
+      <rect x="725" y="498" width="320" height="100" rx="6" fill="rgba(251,146,60,0.2)" stroke="#fb923c" stroke-width="1"/>
+      <text x="885" y="522" text-anchor="middle" fill="#e2e8f0" font-size="11">expressDb (快递表)</text>
+      <text x="885" y="542" text-anchor="middle" fill="#fed7aa" font-size="9">ConcurrentHashMap&lt;Long, ApplyOrderExpressDO&gt;</text>
+      <text x="885" y="558" text-anchor="middle" fill="#94a3b8" font-size="8">expressId → ExpressDO (FK: applyOrderId)</text>
+      <text x="885" y="574" text-anchor="middle" fill="#94a3b8" font-size="8">AtomicLong expressIdGen</text>
+
+      <!-- CRUD flow -->
+      <rect x="55" y="620" width="150" height="55" rx="5" fill="rgba(136,19,55,0.2)" stroke="#fb7185" stroke-width="1"/>
+      <text x="130" y="642" text-anchor="middle" fill="#fb7185" font-size="10">save()</text>
+      <text x="130" y="658" text-anchor="middle" fill="#94a3b8" font-size="8">主DO + 明细DO + 快递DO</text>
+
+      <rect x="230" y="620" width="150" height="55" rx="5" fill="rgba(6,78,59,0.2)" stroke="#34d399" stroke-width="1"/>
+      <text x="305" y="642" text-anchor="middle" fill="#34d399" font-size="10">findById()</text>
+      <text x="305" y="658" text-anchor="middle" fill="#94a3b8" font-size="8">三表回读 + 组装Entity</text>
+
+      <rect x="405" y="620" width="150" height="55" rx="5" fill="rgba(120,53,15,0.2)" stroke="#fbbf24" stroke-width="1"/>
+      <text x="480" y="642" text-anchor="middle" fill="#fbbf24" font-size="10">update()</text>
+      <text x="480" y="658" text-anchor="middle" fill="#94a3b8" font-size="8">删旧子数据 → 存新子数据</text>
+
+      <rect x="580" y="620" width="200" height="55" rx="5" fill="rgba(30,41,59,0.4)" stroke="#94a3b8" stroke-width="1"/>
+      <text x="680" y="642" text-anchor="middle" fill="#94a3b8" font-size="10">CRUD = 查询 + 修改</text>
+      <text x="680" y="658" text-anchor="middle" fill="#f87171" font-size="8">无物理删除 (逻辑删除)</text>
+
+      <!-- Principles -->
+      <text x="550" y="710" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="bold">聚合一致性：存则全存，取则全取。聚合根 + 值对象 = 一个整体。</text>
+
+    </svg>
+  </div>
+</div>
+</body>
+</html>
