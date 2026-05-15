@@ -1,6 +1,6 @@
 package com.viw.ddd.demo.app.applyOrder.service;
 
-import com.viw.ddd.demo.app.applyOrder.dto.ApplyOrderQueryDTO;
+import com.viw.ddd.demo.api.applyOrder.dto.ApplyOrderQueryDTO;
 
 /**
  * 【DDD - 应用层（Application）· 查询服务接口（Query Service）—— CQRS Query 侧】

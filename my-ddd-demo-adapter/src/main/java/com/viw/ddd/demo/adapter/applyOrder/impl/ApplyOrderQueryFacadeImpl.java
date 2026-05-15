@@ -1,7 +1,7 @@
 package com.viw.ddd.demo.adapter.applyOrder.impl;
 
 import com.viw.ddd.demo.api.applyOrder.ApplyOrderQueryFacade;
-import com.viw.ddd.demo.app.applyOrder.dto.ApplyOrderQueryDTO;
+import com.viw.ddd.demo.api.applyOrder.dto.ApplyOrderQueryDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

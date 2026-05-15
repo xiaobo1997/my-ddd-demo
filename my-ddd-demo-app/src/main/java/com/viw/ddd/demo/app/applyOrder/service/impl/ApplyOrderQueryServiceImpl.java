@@ -1,6 +1,6 @@
 package com.viw.ddd.demo.app.applyOrder.service.impl;
 
-import com.viw.ddd.demo.app.applyOrder.dto.ApplyOrderQueryDTO;
+import com.viw.ddd.demo.api.applyOrder.dto.ApplyOrderQueryDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderQueryService;
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 import com.viw.ddd.demo.domain.applyOrder.repository.ApplyOrderRepository;
