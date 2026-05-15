@@ -2,7 +2,8 @@ package com.viw.ddd.demo.infra.applyOrder.repository.impl;
 
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 import com.viw.ddd.demo.domain.applyOrder.repository.ApplyOrderRepository;
-import com.viw.ddd.demo.infra.applyOrder.repository.do.ApplyOrderDO;
+import com.viw.ddd.demo.infra.applyOrder.repository.dataobject.ApplyOrderDO;
+import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author xhb
  */
+@Repository
 public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
 
     /** 内存数据库 */

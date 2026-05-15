@@ -28,10 +28,9 @@
             <artifactId>my-ddd-demo-domain</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.viw</groupId>
-            <artifactId>myb-ddd-demo-infra</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>

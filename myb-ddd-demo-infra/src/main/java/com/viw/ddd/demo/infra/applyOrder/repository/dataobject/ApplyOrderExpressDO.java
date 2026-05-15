@@ -1,4 +1,4 @@
-package com.viw.ddd.demo.infra.applyOrder.repository.do;
+package com.viw.ddd.demo.infra.applyOrder.repository.dataobject;
 
 /**
  * 申请单快递信息数据对象

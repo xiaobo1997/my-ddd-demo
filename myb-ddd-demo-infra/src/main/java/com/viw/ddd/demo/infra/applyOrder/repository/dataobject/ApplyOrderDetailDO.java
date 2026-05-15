@@ -1,4 +1,4 @@
-package com.viw.ddd.demo.infra.applyOrder.repository.do;
+package com.viw.ddd.demo.infra.applyOrder.repository.dataobject;
 
 import java.math.BigDecimal;
 import java.util.Date;
