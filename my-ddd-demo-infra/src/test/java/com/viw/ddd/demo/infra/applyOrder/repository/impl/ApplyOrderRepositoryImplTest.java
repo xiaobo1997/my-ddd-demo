@@ -2,8 +2,13 @@ package com.viw.ddd.demo.infra.applyOrder.repository.impl;
 
 import com.viw.ddd.demo.common.enums.ApplyOrderStatusEnum;
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
+import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderDetailVO;
 import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderExpressVO;
 import com.viw.ddd.demo.infra.applyOrder.assembler.ApplyOrderDataAssembler;
+import com.viw.ddd.demo.infra.applyOrder.assembler.ApplyOrderDetailAssembler;
+import com.viw.ddd.demo.infra.applyOrder.assembler.ApplyOrderExpressAssembler;
+import com.viw.ddd.demo.infra.applyOrder.repository.dataobject.ApplyOrderDetailDO;
+import com.viw.ddd.demo.infra.applyOrder.repository.dataobject.ApplyOrderExpressDO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,6 +41,10 @@ class ApplyOrderRepositoryImplTest {
 
     @Mock
     private ApplyOrderDataAssembler dataAssembler;
+    @Mock
+    private ApplyOrderDetailAssembler detailAssembler;
+    @Mock
+    private ApplyOrderExpressAssembler expressAssembler;
 
     @InjectMocks
     private ApplyOrderRepositoryImpl repository;
@@ -52,6 +61,38 @@ class ApplyOrderRepositoryImplTest {
                     dObj.setApplyOrderNo(entity.getApplyOrderNo());
                     dObj.setStatus(entity.getStatus() != null ? entity.getStatus().getCode() : null);
                     return dObj;
+                });
+
+        // 明细 Assembler stub：VO → DO（字段透传）
+        lenient().when(detailAssembler.toDO(any(ApplyOrderDetailVO.class)))
+                .thenAnswer(inv -> {
+                    ApplyOrderDetailVO vo = inv.getArgument(0);
+                    ApplyOrderDetailDO dObj = new ApplyOrderDetailDO();
+                    dObj.setId(vo.getId());
+                    return dObj;
+                });
+
+        // 快递 Assembler stub：VO → DO（字段透传）
+        lenient().when(expressAssembler.toDO(any(ApplyOrderExpressVO.class)))
+                .thenAnswer(inv -> {
+                    ApplyOrderExpressVO vo = inv.getArgument(0);
+                    ApplyOrderExpressDO dObj = new ApplyOrderExpressDO();
+                    dObj.setId(vo.getId());
+                    dObj.setExpressNo(vo.getExpressNo());
+                    return dObj;
+                });
+
+        // 明细 Assembler stub：DO → VO（回读）
+        lenient().when(detailAssembler.toVO(any(ApplyOrderDetailDO.class)))
+                .thenAnswer(inv -> new ApplyOrderDetailVO());
+
+        // 快递 Assembler stub：DO → VO（回读）
+        lenient().when(expressAssembler.toVO(any(ApplyOrderExpressDO.class)))
+                .thenAnswer(inv -> {
+                    ApplyOrderExpressDO dObj = inv.getArgument(0);
+                    ApplyOrderExpressVO vo = new ApplyOrderExpressVO();
+                    vo.setExpressNo(dObj.getExpressNo());
+                    return vo;
                 });
 
         // 每次 toEntity 调用返回一个新的 Entity（模拟真实映射）
