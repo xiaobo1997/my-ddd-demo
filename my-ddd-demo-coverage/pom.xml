@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.viw</groupId>
+        <artifactId>my-ddd-demo</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>my-ddd-demo-coverage</artifactId>
+    <packaging>pom</packaging>
+
+    <!--
+      JaCoCo 聚合覆盖率模块。
+      职责：收集所有模块的 jacoco.exec，生成一份统一的 HTML 覆盖率报告。
+
+      使用方式：
+        mvn clean test    → 各模块生成 jacoco.exec
+        mvn verify        → 本模块收集并聚合报告
+
+      聚合报告位置：my-ddd-demo-coverage/target/site/jacoco-aggregate/index.html
+    -->
+
+    <!-- 依赖所有业务模块，确保 test 阶段它们先执行 -->
+    <dependencies>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-app</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-infra</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-adapter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-common</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <!--
+                      report-aggregate：收集所有依赖模块的 jacoco.exec，
+                      合并生成一份聚合覆盖率报告。
+                    -->
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 报告输出目录 -->
+                            <outputDirectory>
+                                ${project.build.directory}/site/jacoco-aggregate
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
