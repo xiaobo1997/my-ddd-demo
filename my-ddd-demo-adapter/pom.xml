@@ -20,11 +20,23 @@
     <dependencies>
         <dependency>
             <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
             <artifactId>my-ddd-demo-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.viw</groupId>
             <artifactId>my-ddd-demo-app</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
     </dependencies>

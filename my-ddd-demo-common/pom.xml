@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>my-ddd-demo-domain</artifactId>
+    <artifactId>my-ddd-demo-common</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -18,10 +18,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.viw</groupId>
-            <artifactId>my-ddd-demo-common</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

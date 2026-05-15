@@ -15,6 +15,7 @@
         <module>my-ddd-demo-domain</module>
         <module>myb-ddd-demo-infra</module>
         <module>my-ddd-demo-start</module>
+        <module>my-ddd-demo-common</module>
     </modules>
 
     <properties>
@@ -55,6 +56,12 @@
             <dependency>
                 <groupId>com.viw</groupId>
                 <artifactId>myb-ddd-demo-infra</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.viw</groupId>
+                <artifactId>my-ddd-demo-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

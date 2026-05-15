@@ -1,5 +1,6 @@
 package com.viw.ddd.demo.domain.applyOrder.entity;
 
+import com.viw.ddd.demo.common.enums.ApplyOrderStatusEnum;
 import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderDetailVO;
 import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderExpressVO;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ import java.util.List;
  *   ApplyOrderEntity 是实体（有 id），ApplyOrderDetailVO 是值对象（无 id）
  *
  * 状态流转：
- *   DRAFT → APPROVED → BATCHING → INVOICED → MAILED → EXPRESSED
+ *   DRAFT → APPROVED → CREATE_BATCH → INVOICE_FINISHED → SENT_MAIL → SENT_EXPRESS
  *   每个方法内部有 assertStatusIn() 校验，防止非法跳转。
  *
  * @author xhb
@@ -37,14 +38,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApplyOrderEntity implements Serializable {
-
-    // ========== 状态常量 ==========
-    public static final String STATUS_DRAFT = "DRAFT";
-    public static final String STATUS_APPROVED = "APPROVED";
-    public static final String STATUS_BATCHING = "BATCHING";
-    public static final String STATUS_INVOICED = "INVOICED";
-    public static final String STATUS_MAILED = "MAILED";
-    public static final String STATUS_EXPRESSED = "EXPRESSED";
 
     // ========== 实体属性 ==========
     /** 唯一标识（主键） */
@@ -68,7 +61,7 @@ public class ApplyOrderEntity implements Serializable {
     /** 总金额 = 申请金额 + 运费 + 服务费 */
     private BigDecimal totalAmount;
     /** 状态 */
-    private String status;
+    private ApplyOrderStatusEnum status;
 
     // ========== 关联的值对象 ==========
     /** 申请单明细列表（值对象集合） */
@@ -82,54 +75,54 @@ public class ApplyOrderEntity implements Serializable {
      * 校验当前状态是否在期望状态集合中
      * DDD 实践中，将校验逻辑内聚在实体内部，避免贫血模型
      */
-    private void assertStatusIn(String... expected) {
-        for (String s : expected) {
-            if (s.equals(this.status)) {
+    private void assertStatusIn(ApplyOrderStatusEnum... expected) {
+        for (ApplyOrderStatusEnum s : expected) {
+            if (s == this.status) {
                 return;
             }
         }
         throw new IllegalStateException(
-                "当前状态[" + status + "]不允许此操作，期望状态: " + String.join(",", expected));
+                "当前状态[" + status + "]不允许此操作");
     }
 
     /** 创建申请单 — 初始化状态、申请单号、申请日期 */
     public void create() {
         this.applyOrderNo = generateOrderNo();
         this.applyDate = new Date();
-        this.status = STATUS_DRAFT;
+        this.status = ApplyOrderStatusEnum.DRAFT;
     }
 
     /** 审批通过 */
     public void approve() {
-        assertStatusIn(STATUS_DRAFT);
-        this.status = STATUS_APPROVED;
+        assertStatusIn(ApplyOrderStatusEnum.DRAFT);
+        this.status = ApplyOrderStatusEnum.APPROVED;
     }
 
     /** 创建开票批次 */
     public void createBatch() {
-        assertStatusIn(STATUS_APPROVED);
-        this.status = STATUS_BATCHING;
+        assertStatusIn(ApplyOrderStatusEnum.APPROVED);
+        this.status = ApplyOrderStatusEnum.CREATE_BATCH;
     }
 
     /** 完成开票 */
     public void finishInvoice() {
-        assertStatusIn(STATUS_BATCHING);
-        this.status = STATUS_INVOICED;
+        assertStatusIn(ApplyOrderStatusEnum.CREATE_BATCH);
+        this.status = ApplyOrderStatusEnum.INVOICE_FINISHED;
     }
 
     /** 寄送发票（电子票） */
     public void sendMail() {
-        assertStatusIn(STATUS_INVOICED);
-        this.status = STATUS_MAILED;
+        assertStatusIn(ApplyOrderStatusEnum.INVOICE_FINISHED);
+        this.status = ApplyOrderStatusEnum.SENT_MAIL;
     }
 
     /** 快递纸质发票 — 调用值对象的 send() 方法 + 推进状态 */
     public void sendExpress(String expressNo) {
-        assertStatusIn(STATUS_MAILED);
+        assertStatusIn(ApplyOrderStatusEnum.SENT_MAIL);
         if (applyOrderExpressVO != null) {
             applyOrderExpressVO.send(expressNo);
         }
-        this.status = STATUS_EXPRESSED;
+        this.status = ApplyOrderStatusEnum.SENT_EXPRESS;
     }
 
     // ========== 辅助方法 ==========

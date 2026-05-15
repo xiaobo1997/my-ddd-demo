@@ -48,7 +48,7 @@ public class ApplyOrderQueryServiceImpl implements ApplyOrderQueryService {
                 .freightFee(entity.getFreightFee())
                 .serviceFee(entity.getServiceFee())
                 .totalAmount(entity.getTotalAmount())
-                .status(entity.getStatus())
+                .status(entity.getStatus().name())
                 .build();
     }
 }

@@ -20,6 +20,10 @@
     <dependencies>
         <dependency>
             <groupId>com.viw</groupId>
+            <artifactId>my-ddd-demo-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.viw</groupId>
             <artifactId>my-ddd-demo-api</artifactId>
         </dependency>
         <dependency>
