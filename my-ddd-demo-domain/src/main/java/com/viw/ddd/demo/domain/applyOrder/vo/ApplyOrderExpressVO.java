@@ -24,7 +24,7 @@ public class ApplyOrderExpressVO {
     private String deliveryCompany;
     private String expressNo;
 
-    public void sned(String expressNo) {
+    public void send(String expressNo) {
         //发送快递
         this.expressNo = expressNo;
     }
