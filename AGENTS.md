@@ -76,11 +76,8 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 
 ### ❌ 严重问题
 
-**① Package 名称拼写错误：`domin` → `domain`**
-- 实际路径：`com/viw/ddd/demo/domin/` 
-- 应该改为：`com/viw/ddd/demo/domain/`
-- 影响：domain 模块下的 entity、repository、vo 三个包名全错
-- 修复范围：需要修改 7 个文件的 package 声明 + 对应的 import 引用
+**① Package 名称拼写错误：`domin` → `domain`** ✅ 已修复
+- 9 个 Java 文件 + 文档已完成重命名
 
 **② Module 命名不一致：`myb-ddd-demo-infra`**
 - 其他模块：`my-ddd-demo-api/app/adapter/domain/start`
@@ -120,7 +117,7 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 - [ ] 修复 DO 文件后缀（加 `.java`）
 - [ ] 补充 `ApplyOrderConvert` 实现类
 - [ ] 添加 Spring Boot 依赖和启动类
-- [ ] 修复 `domin` → `domain` 包名（7+个文件）
+- [x] 修复 `domin` → `domain` 包名（9 个文件 + 文档）
 
 ### P1 — 核心业务逻辑
 - [ ] 实现 `ApplyOrderEntity` 的业务方法：create()、approve()、createBatch()、finishInvoice()、sendMail()

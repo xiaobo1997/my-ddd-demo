@@ -2,7 +2,7 @@ package com.viw.ddd.demo.app.applyOrder.convert;
 
 import com.viw.ddd.demo.app.applyOrder.event.publish.ApplyOrderSubmittedEvent;
 import com.viw.ddd.demo.app.applyOrder.event.publish.ExpressSentEvent;
-import com.viw.ddd.demo.domin.applyOrder.entity.ApplyOrderEntity;
+import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 
 /**
  * @author xhb

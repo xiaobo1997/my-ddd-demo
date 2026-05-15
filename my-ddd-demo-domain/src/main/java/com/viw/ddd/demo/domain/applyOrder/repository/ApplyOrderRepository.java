@@ -1,6 +1,6 @@
-package com.viw.ddd.demo.domin.applyOrder.repository;
+package com.viw.ddd.demo.domain.applyOrder.repository;
 
-import com.viw.ddd.demo.domin.applyOrder.entity.ApplyOrderEntity;
+import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 
 /**
  * @author xhb

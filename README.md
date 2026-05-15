@@ -58,7 +58,7 @@ infra   → domain
 
 ## TODO / 演进计划
 
-- [ ] 修复包名拼写错误（domin → domain）
+- [ ] 修复包名拼写错误（domain → domain）
 - [ ] 统一模块命名（myb → my）
 - [ ] 引入 Spring Boot 依赖与 IoC 容器
 - [ ] 补齐领域实体业务方法

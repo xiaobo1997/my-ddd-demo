@@ -2,7 +2,7 @@ package com.viw.ddd.demo.app.applyOrder.factory;
 
 import com.alibaba.fastjson.JSONObject;
 import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
-import com.viw.ddd.demo.domin.applyOrder.entity.ApplyOrderEntity;
+import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 
 /**
  * @author xhb

@@ -1,7 +1,7 @@
-package com.viw.ddd.demo.domin.applyOrder.entity;
+package com.viw.ddd.demo.domain.applyOrder.entity;
 
-import com.viw.ddd.demo.domin.applyOrder.vo.ApplyOrderDetailVO;
-import com.viw.ddd.demo.domin.applyOrder.vo.ApplyOrderExpressVO;
+import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderDetailVO;
+import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderExpressVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

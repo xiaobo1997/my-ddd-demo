@@ -1,4 +1,4 @@
-package com.viw.ddd.demo.domin.applyOrder.vo;
+package com.viw.ddd.demo.domain.applyOrder.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
