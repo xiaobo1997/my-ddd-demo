@@ -203,21 +203,52 @@ DRAFT → EXPRESSED → APPROVED → CREATE_BATCH
 > 问：Entity 和 DO 为什么要分开？
 > 答：Entity 包含业务行为，DO 只是数据库映射。分开后可以独立演化（改表不一定改 Entity，加业务逻辑不一定改表）。这就是"持久化无关"。
 
+### 6. 通用模块 (Common) — `my-ddd-demo-common`
+
+**定位**：跨层共用的基础设施代码。不属于 DDD 四层中的任何一层，但所有层都可以依赖它。
+
+**代码位置**：`my-ddd-demo-common/src/main/java/com/viw/ddd/demo/common/`
+
+**关键文件**：
+
+| 类别 | 文件 | 说明 |
+|------|------|------|
+| 业务异常 | `BusinessException.java` | code + message，统一异常体系 |
+| 参数校验异常 | `ValidationException.java` | 参数不合法时抛出 |
+| 状态枚举 | `ApplyOrderStatusEnum.java` | 替代 String 常量，类型安全 |
+| 统一返回体 | `Result.java` | 所有 Controller 返回 `Result<T>` |
+| 分页结果 | `PageResult.java` | 分页查询通用返回 |
+
+**DDD 知识点**：
+> Common 模块的定位常被讨论——它不是 DDD 战术设计的一部分，但实际项目中必不可少。关键是：Common 不包含业务逻辑，只提供技术性基础设施。
+
+---
+
+### 7. 适配层的扩展（Adapter）
+
+除了 Facade/Controller，Adapter 层还承担这些角色：
+
+| 场景 | 类 | 说明 |
+|------|-----|------|
+| 定时任务 | `ApplyOrderScheduler` | @Scheduled，模拟超时检查 |
+| HTTP 回调 | `ApplyOrderCallbackController` | 接收第三方审批结果回调 |
+| MQ 消费者 | `ApplyOrderEventConsumer` | 模拟 Kafka/RabbitMQ 消息消费 |
+| 全局异常处理 | `GlobalExceptionHandler` | @RestControllerAdvice，统一异常→Result |
+
+**统一模式**：所有外部触发（HTTP/MQ/定时）→ Adapter → App Service → Domain，不直接操作领域对象。
+
 ---
 
 ## 三、依赖方向总结
 
 ```
-正确方向（已修复）：
-  API → Domain（VO）
-  Adapter → App
+ 正确方向（当前版本）：
+  API → Domain（VO/DTO）
+  Adapter → App + API
   App → Domain（接口：Repository/Gateway）
   Infra → Domain（实现接口）
+  Common ← Adapter/App/Domain/Infra（公共依赖）
   Start → 所有模块（组装）
-
-错误方向（已修复）：
-  App → Infra ❌ 违反 DIP
-  Gateway接口放在Infra ❌ 接口应该在Domain
 ```
 
 **核心原则**：Domain 层是 0 依赖的纯 POJO，所有箭头指向 Domain。
@@ -236,10 +267,18 @@ DRAFT → EXPRESSED → APPROVED → CREATE_BATCH
 | 领域事件 | `ApplyOrderSubmittedEvent`, `ExpressSentEvent` | app |
 | 应用服务 | `ApplyOrderServiceImpl` | app |
 | 命令 | `SubmitApplyOrderCommand`, `SendExpressCommand` | api |
-| 防腐层 | `CompanyGateway`(接口) → `CompanyGatewayImpl`(实现) | domain/infra |
+| 查询门面 | `ApplyOrderQueryFacade` | api |
+| 防腐层 | `CompanyGateway`(接口)→`CompanyGatewayImpl`(实现), `SubmitApplyOrderDTO`+`ApplyOrderAssembler` | domain/infra, app |
 | 数据对象 | `ApplyOrderDO` | infra |
 | 转换器 | `ApplyOrderConvertImpl` | app |
+| MapStruct | `ApplyOrderAssembler`, `ApplyOrderDataAssembler` | app, infra |
 | 适配器 | `ApplyOrderCommandFacadeImpl` | adapter |
+| 异常处理 | `GlobalExceptionHandler` | adapter |
+| 定时任务 | `ApplyOrderScheduler` | adapter |
+| 回调/消费者 | `ApplyOrderCallbackController`, `ApplyOrderEventConsumer` | adapter |
+| 业务异常 | `BusinessException` | common |
+| 枚举 | `ApplyOrderStatusEnum` | common |
+| 统一返回 | `Result<T>` | common |
 
 ---
 

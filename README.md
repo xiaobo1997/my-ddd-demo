@@ -2,92 +2,144 @@
 
 基于领域驱动设计（DDD）的多模块 Java 工程**教学脚手架**，使用 Java 8 + Maven 构建。
 
-## 🎯 项目目标
+## 项目目标
 
 **展示一个完整的 DDD 工程模板长什么样。** 每个类都用注释注明：
 
-- 这个类属于 DDD 的**哪一层**（API/Application/Domain/Infrastructure/Adapter）
-- 它在 DDD 中扮演的**角色**是什么（聚合根/值对象/仓储/工厂/应用服务/转换器等）
+- 这个类属于 DDD 的**哪一层**
+- 它在 DDD 中扮演的**角色**是什么
 - 它和相邻组件如何**协作**
 
-让没接触过 DDD 的程序员一看就能理解分层结构和职责划分。
+## 模块全景
 
-## 🏗 模块结构（DDD 经典四层架构）
+| 模块 | 层 | 职责 | 关键类 |
+|------|---|------|--------|
+| **my-ddd-demo-api** | 接口层 | 对外契约：Command / Facade 接口 / QueryDTO | `ApplyOrderCommandFacade`, `ApplyOrderQueryFacade`, `*Command`, `*QueryDTO` |
+| **my-ddd-demo-adapter** | 适配层 | 外部入口适配：Controller / 定时任务 / 回调 / MQ消费者 / 异常处理 | `*FacadeImpl`, `*Scheduler`, `*CallbackController`, `*EventConsumer`, `GlobalExceptionHandler` |
+| **my-ddd-demo-app** | 应用层 | 流程编排 + 防腐层：Service / Factory / Convert / Assembler | `ApplyOrderServiceImpl`, `ApplyOrderQueryServiceImpl`, `*Assembler` (MapStruct), `*Factory` |
+| **my-ddd-demo-domain** | 领域层 | 核心：Entity / VO / Repository接口 / Gateway接口 | `ApplyOrderEntity`, `ApplyOrderDetailVO`, `*Repository`, `*Gateway` |
+| **myb-ddd-demo-infra** | 基础设施层 | 技术实现：Repository实现 / Gateway实现 / MQ实现 / DO | `ApplyOrderRepositoryImpl`, `*GatewayImpl`, `*DO`, `ApplyOrderDataAssembler` |
+| **my-ddd-demo-common** | 通用模块 | 跨层共用：异常 / 枚举 / 基础DTO | `BusinessException`, `ApplyOrderStatusEnum`, `Result<T>`, `PageResult<T>` |
+| **my-ddd-demo-start** | 启动模块 | 组装+启动：Spring Boot 启动类 | `Main` |
 
+**依赖方向**（箭头 = 依赖）：
 ```
-┌─────────────────────────────────────┐
-│  api 接口层                          │
-│  ApplyOrderCommandFacade (门面接口)   │
-│  SubmitApplyOrderCommand (命令对象)    │
-├─────────────────────────────────────┤
-│  adapter 适配层                      │
-│  ApplyOrderCommandFacadeImpl (实现)   │
-├─────────────────────────────────────┤
-│  app 应用层                          │
-│  ApplyOrderService (应用服务)         │
-│  ApplyOrderFactory (工厂)            │
-│  ApplyOrderConvert (转换器)          │
-│  *SubmittedEvent / *SentEvent (事件) │
-├─────────────────────────────────────┤
-│  domain 领域层 (核心)                 │
-│  ApplyOrderEntity (聚合根 + 业务方法) │
-│  ApplyOrderRepository (仓储接口)      │
-│  ApplyOrderDetailVO / ExpressVO (值对象)│
-├─────────────────────────────────────┤
-│  infra 基础设施层                     │
-│  ApplyOrderRepositoryImpl (仓储实现)   │
-│  ApplyOrderDO / DetailDO / ExpressDO │
-│  CompanyGateway (外部网关)           │
-│  MqSender (消息发送器)               │
-└─────────────────────────────────────┘
+start → adapter → app → domain ← infra
+                  ↘ common ↙
+api     →     domain
 ```
 
-## 📖 核心 DDD 概念速览
+## DDD 核心概念速览
 
-| 概念 | 本工程中的体现 | 说明 |
-|------|--------------|------|
-| **聚合根 (Aggregate Root)** | `ApplyOrderEntity` | 有唯一ID，聚合内的入口，保证数据一致性 |
-| **实体 (Entity)** | `ApplyOrderEntity` | 有唯一标识（id），状态可变 |
-| **值对象 (VO)** | `ApplyOrderDetailVO`, `ApplyOrderExpressVO` | 无唯一标识，描述性，依附于实体 |
-| **仓储 (Repository)** | `ApplyOrderRepository` | 聚合根的持久化抽象，接口在 domain，实现 infra |
-| **工厂 (Factory)** | `ApplyOrderFactory` | 封装复杂实体创建逻辑 |
-| **应用服务 (App Service)** | `ApplyOrderService` | 编排业务流程，不包含业务规则 |
-| **领域事件 (Domain Event)** | `*SubmittedEvent`, `*SentEvent` | 已发生的事情，通过 MQ 通知其他系统 |
-| **Gateway (网关)** | `CompanyGateway` | 封装对外部系统的调用 |
-| **数据对象 (DO)** | `*DO` | 与数据库表对应的持久化对象 |
-| **命令对象 (Command)** | `*Command` | 封装一次业务操作的输入参数 |
+| 概念 | 本工程对应 | 层 |
+|------|----------|-----|
+| 聚合根 (Aggregate Root) | `ApplyOrderEntity` | domain |
+| 值对象 (VO) | `ApplyOrderDetailVO`, `ApplyOrderExpressVO` | domain |
+| 仓储 (Repository) | `ApplyOrderRepository` → `ApplyOrderRepositoryImpl` | domain/infra |
+| 防腐层 (ACL) | `CompanyGateway` → `CompanyGatewayImpl` | domain/infra |
+| CQRS 命令 (Command) | `SubmitApplyOrderCommand`, `SendExpressCommand` | api |
+| CQRS 查询 (Query) | `ApplyOrderQueryFacade`, `ApplyOrderQueryDTO` | api |
+| 防腐 DTO | `SubmitApplyOrderDTO` (Command→DTO 隔离) | app |
+| MapStruct 映射 | `ApplyOrderAssembler` (Command→DTO), `ApplyOrderDataAssembler` (DO↔Entity) | app/infra |
+| 应用服务 | `ApplyOrderServiceImpl` (写), `ApplyOrderQueryServiceImpl` (读) | app |
+| 领域事件 | `ApplyOrderSubmittedEvent`, `ExpressSentEvent` | app |
+| 工厂 | `ApplyOrderFactory` | app |
+| 枚举 | `ApplyOrderStatusEnum` | common |
+| 异常 | `BusinessException`, `ValidationException` | common |
+| 统一返回 | `Result<T>` | common |
+| 全局异常处理 | `GlobalExceptionHandler` | adapter |
+| 定时任务 | `ApplyOrderScheduler` | adapter |
+| HTTP 回调 | `ApplyOrderCallbackController` | adapter |
+| MQ 消费者 | `ApplyOrderEventConsumer` | adapter |
 
-## 🔄 一次完整的请求流程
+## 两种完整请求流程
 
+### 命令流程（写操作，CQRS Command 侧）
 ```
-submitApplyOrder(Command)
-     │
-     ▼
-ApplyOrderCommandFacadeImpl (Adapter)
-     │  透传 Command
-     ▼
-ApplyOrderServiceImpl (Application)
-     │  ├─ CompanyGateway.findByCompanyId() → 查外部公司信息
-     │  ├─ ApplyOrderFactory.createApplyOrder() → 创建聚合根
-     │  ├─ ApplyOrderRepository.save() → 持久化聚合根
-     │  └─ MqSender.send(Event) → 发布领域事件
-     ▼
+外部 RPC/HTTP 请求
+    │ SubmitApplyOrderCommand (api)
+    ▼
+ApplyOrderCommandFacadeImpl (adapter)
+    │ 防腐: Command → DTO (MapStruct)
+    ▼
+ApplyOrderServiceImpl (app)
+    │ ├─ CompanyGateway.findByCompanyId()
+    │ ├─ ApplyOrderFactory.createApplyOrder()
+    │ ├─ ApplyOrderRepository.save()
+    │ └─ MqSender.send(Event)
+    ▼
 完成
 ```
 
-## 🛠 技术栈
+### 查询流程（读操作，CQRS Query 侧）
+```
+外部 HTTP 请求
+    │ id (Long)
+    ▼
+ApplyOrderQueryFacadeImpl (adapter)
+    │ 转发
+    ▼
+ApplyOrderQueryServiceImpl (app)
+    │ Repository.findById(id) → Entity → QueryDTO
+    ▼
+返回 ApplyOrderQueryDTO (api)
+```
+
+## 定时任务 / 回调 / MQ 消费者定位
+
+| 场景 | 放哪层 | 原因 |
+|------|--------|------|
+| 定时任务 | adapter/scheduler | 外部触发，类似 Controller |
+| HTTP 回调 | adapter/callback | 第三方入口，属于适配层 |
+| MQ 消费者 | adapter/consumer | 消息适配，和 HTTP 同级 |
+| 异常定义 | common | 所有层共用 |
+| 全局异常处理 | adapter/advice | @RestControllerAdvice 是技术细节 |
+
+> 核心原则：**所有外部触发（HTTP/MQ/定时）都走 adapter，统一调用 app 层服务。**
+
+## 发布 API 包到 Maven 仓库
+
+### 使用场景
+你的团队开发了 `my-ddd-demo-api` 模块，其他团队需要调用你的 RPC 接口。
+把 API 包发布到公司内部 Maven 仓库（如 Nexus），其他团队直接引入依赖即可。
+
+### 发布步骤
+```bash
+# 只发布 api 模块
+mvn clean deploy -pl my-ddd-demo-api -am -DskipTests
+```
+
+### 其他团队引入
+```xml
+<dependency>
+    <groupId>com.viw</groupId>
+    <artifactId>my-ddd-demo-api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+引入后即可通过 Dubbo / gRPC / HTTP 调用 `ApplyOrderCommandFacade` 等方法。
+
+> 父 pom.xml 中有 `distributionManagement` 配置说明（已注释），需替换为公司实际仓库地址。
+
+## 技术栈
 
 - **Java 8** — 语言版本
-- **Maven** — 项目构建
+- **Maven** — 项目构建 + 发布
+- **Spring Boot 2.7.18** — IoC + Web
+- **MapStruct 1.4.2** — 编译期对象映射（Command→DTO / DO↔Entity）
 - **Lombok** — 简化 POJO
 - **Fastjson** — JSON 序列化
-- **Spring Boot 2.7.18** — IoC 容器 + Web 支持（Java 8 兼容版本）
 
-## 🚀 快速开始
+## 快速开始
 
 ```bash
 mvn clean compile
 ```
+
+## 文档
+
+- [DDD 分层架构详解](docs/DDD分层架构详解.md) — 逐层讲解 + 代码对照
+- [面试高频 DDD 问题](docs/面试高频DDD问题.md) — 10+ 题 + 本仓库实例
 
 ---
 

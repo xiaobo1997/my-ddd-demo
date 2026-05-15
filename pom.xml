@@ -91,6 +91,33 @@
         </dependencies>
     </dependencyManagement>
 
+    <!--
+      Maven 仓库发布配置。
+      使用 mvn deploy 将 API 包推送到公司内部 Maven 私有仓库（如 Nexus / Artifactory）。
+      其他团队在 pom.xml 引入 my-ddd-demo-api 依赖后，即可通过 Dubbo/HTTP 调 RPC 接口。
+
+      实际配置示例（需替换为公司仓库地址）：
+      <distributionManagement>
+          <snapshotRepository>
+              <id>company-snapshots</id>
+              <url>http://nexus.company.com/repository/maven-snapshots/</url>
+          </snapshotRepository>
+          <repository>
+              <id>company-releases</id>
+              <url>http://nexus.company.com/repository/maven-releases/</url>
+          </repository>
+      </distributionManagement>
+
+      同时需在 ~/.m2/settings.xml 配置对应 server 的账号密码：
+      <servers>
+          <server>
+              <id>company-snapshots</id>
+              <username>your-username</username>
+              <password>your-password</password>
+          </server>
+      </servers>
+    -->
+
     <build>
         <pluginManagement>
             <plugins>

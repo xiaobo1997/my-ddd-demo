@@ -11,12 +11,19 @@
 
     <artifactId>my-ddd-demo-api</artifactId>
 
+    <!--
+      API 模块作为公共契约包，可独立发布到公司 Maven 私有仓库。
+      其他团队引入依赖后，即可通过 Dubbo/gRPC/HTTP 调用本服务的 RPC 接口。
+
+      发布命令：mvn clean deploy -DskipTests
+      需在 settings.xml 配置仓库账号密码。
+    -->
+
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
 
     <dependencies>
         <dependency>
@@ -29,4 +36,34 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- 打包源码（其他团队引入后可看到接口注释和实现细节） -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 打包 Javadoc（可选，建议在 release 时开启） -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <!-- 跳过 Javadoc 以避免编译警告阻塞构建 -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -184,6 +184,52 @@ infra/ApplyOrderRepositoryImpl.java  ← 实现："我用 ConcurrentHashMap 实�
 
 ---
 
+## Q11: 异常处理放在哪一层？为什么？
+
+**一句话**：异常类放 common，全局异常处理器放 adapter。
+
+| | 放哪 | 原因 |
+|---|------|------|
+| 业务异常类 | common | 所有层都能抛出，不属任何一层 |
+| 全局异常处理 | adapter | @RestControllerAdvice 是 Web 层技术细节 |
+
+**看本仓库**：
+- 异常类：`common/BusinessException.java` — 带 code + message
+- 异常处理：`adapter/advice/GlobalExceptionHandler.java` — BusinessException → Result.fail()
+
+**面试金句**：
+> "异常处理分两层：common 定义异常类型（纯 POJO），adapter 负责翻译为 HTTP 响应。Domain 层只需要 throw，不需要知道什么是 JSON。"
+
+---
+
+## Q12: 定时任务、MQ 消费者、第三方回调分别放哪层？
+
+**一句话**：全部放 adapter 层，它们本质都是"外部触发"。
+
+| 场景 | 放哪 | 类比 |
+|------|------|------|
+| 定时任务 | adapter/scheduler | 时间触发 = 另一种 Controller |
+| MQ 消费者 | adapter/consumer | 消息触发 = 另一种 Controller |
+| HTTP 回调 | adapter/callback | 外部 HTTP = 另一种 Controller |
+
+**统一模式**：
+```
+外部触发（定时/MQ/HTTP回调）
+    → Adapter（接收 + 转换）
+        → App Service（编排）
+            → Domain（业务逻辑）
+```
+
+**看本仓库**：
+- 定时：`adapter/scheduler/ApplyOrderScheduler` → 调 `ApplyOrderQueryService`
+- 回调：`adapter/callback/ApplyOrderCallbackController` → 调 `ApplyOrderService`
+- MQ：`adapter/consumer/ApplyOrderEventConsumer` → 调 `ApplyOrderService`
+
+**面试金句**：
+> "所有外部触发都走 adapter 层，原因很简单：换一个 MQ 中间件、换个调度框架，只需改 adapter，app 和 domain 一行不动。"
+
+---
+
 ## 快速自测清单
 
 面试前快速过一遍，看着概念能说出代码位置：
@@ -193,9 +239,13 @@ infra/ApplyOrderRepositoryImpl.java  ← 实现："我用 ConcurrentHashMap 实�
 - [ ] 仓储 → `ApplyOrderRepository.java`（接口）+ `ApplyOrderRepositoryImpl.java`（实现）
 - [ ] 工厂 → `ApplyOrderFactory.java`
 - [ ] 应用服务 → `ApplyOrderServiceImpl.java`
-- [ ] 防腐层 → `CompanyGateway.java`（接口）+ `CompanyGatewayImpl.java`（实现）
+- [ ] 防腐层 → `CompanyGateway.java`（接口）+ `ApplyOrderAssembler`(MapStruct)
 - [ ] 领域事件 → `ApplyOrderSubmittedEvent.java`
 - [ ] Command → `SubmitApplyOrderCommand.java`
 - [ ] DO → `ApplyOrderDO.java`
-- [ ] 转换器 → `ApplyOrderConvertImpl.java`
-- [ ] MQ 抽象 → `MqSender.java`（接口）+ `MqSenderImpl.java`（实现）
+- [ ] MapStruct → `ApplyOrderAssembler.java`, `ApplyOrderDataAssembler.java`
+- [ ] 异常处理 → `GlobalExceptionHandler.java` + `BusinessException.java`
+- [ ] 定时任务 → `ApplyOrderScheduler.java`
+- [ ] MQ 消费者 → `ApplyOrderEventConsumer.java`
+- [ ] HTTP 回调 → `ApplyOrderCallbackController.java`
+- [ ] CQRS 查询 → `ApplyOrderQueryFacade` + `ApplyOrderQueryServiceImpl`
