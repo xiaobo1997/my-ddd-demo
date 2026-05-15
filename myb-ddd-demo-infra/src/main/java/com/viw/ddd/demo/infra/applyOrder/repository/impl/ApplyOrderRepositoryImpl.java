@@ -2,24 +2,29 @@ package com.viw.ddd.demo.infra.applyOrder.repository.impl;
 
 import com.viw.ddd.demo.domain.applyOrder.entity.ApplyOrderEntity;
 import com.viw.ddd.demo.domain.applyOrder.repository.ApplyOrderRepository;
-import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderDetailVO;
-import com.viw.ddd.demo.domain.applyOrder.vo.ApplyOrderExpressVO;
 import com.viw.ddd.demo.infra.applyOrder.repository.do.ApplyOrderDO;
-import com.viw.ddd.demo.infra.applyOrder.repository.do.ApplyOrderDetailDO;
-import com.viw.ddd.demo.infra.applyOrder.repository.do.ApplyOrderExpressDO;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
- * 申请单仓储实现（内存版）
+ * 【DDD - 基础设施层（Infrastructure）· 仓储实现（Repository Implementation）】
+ *
+ * 仓储接口的持久化实现。
+ * 当前用 ConcurrentHashMap 模拟数据库，体现了 DDD 的一个重要思想：
+ *   领域层定义"做什么"（接口），基础设施层定义"怎么做"（实现）。
+ *
+ * 完整实现需要：
+ *   1. Entity → DO 转换（领域对象转持久化对象）
+ *   2. DO → Entity 转换（持久化对象转领域对象）
+ *   3. 数据库操作（当前为内存 Map）
+ *
+ * DO（Data Object）：
+ *   与数据库表结构一一对应的对象，仅用于持久化层内部
+ *   不能暴露给领域层，领域层只认识 Entity
+ *
+ * @author xhb
  */
 public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
 
@@ -31,6 +36,7 @@ public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
 
     @Override
     public Long save(ApplyOrderEntity entity) {
+        // 自动生成 ID（实际项目用 DB 自增或雪花算法）
         if (entity.getId() == null) {
             entity.setId(idGenerator.getAndIncrement());
         }
@@ -54,6 +60,7 @@ public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
         if (entity == null) {
             return null;
         }
+        // "detail" 模式下只返回基础信息，不包含快递信息
         if ("detail".equals(type)) {
             entity.setApplyOrderExpressVO(null);
         }
@@ -72,6 +79,10 @@ public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
 
     // ========== DO ↔ Entity 转换 ==========
 
+    /**
+     * Entity → DO 转换
+     * 职责：将领域对象转为持久化对象（写数据库时用）
+     */
     private ApplyOrderDO toDO(ApplyOrderEntity entity) {
         if (entity == null) return null;
         ApplyOrderDO doObj = new ApplyOrderDO();
@@ -88,6 +99,10 @@ public class ApplyOrderRepositoryImpl implements ApplyOrderRepository {
         return doObj;
     }
 
+    /**
+     * DO → Entity 转换
+     * 职责：将持久化对象转为领域对象（读数据库后用）
+     */
     private ApplyOrderEntity toEntity(ApplyOrderDO doObj) {
         if (doObj == null) return null;
         return ApplyOrderEntity.builder()

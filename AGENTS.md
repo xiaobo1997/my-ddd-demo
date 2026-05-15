@@ -114,15 +114,15 @@ Do not commit local IDE metadata, generated build output, credentials, or enviro
 ## 4. TODO 清单（按优先级）
 
 ### P0 — 阻塞编译的
-- [ ] 修复 DO 文件后缀（加 `.java`）
-- [ ] 补充 `ApplyOrderConvert` 实现类
-- [ ] 添加 Spring Boot 依赖和启动类
+- [x] 修复 DO 文件后缀（加 `.java`）
+- [x] 补充 `ApplyOrderConvert` 实现类
+- [x] 添加 Spring Boot 依赖和启动类
 - [x] 修复 `domin` → `domain` 包名（9 个文件 + 文档）
 
 ### P1 — 核心业务逻辑
-- [ ] 实现 `ApplyOrderEntity` 的业务方法：create()、approve()、createBatch()、finishInvoice()、sendMail()
-- [ ] 实现 `ApplyOrderFactory.createApplyOrder()` — 从 Command 组装完整 Entity
-- [ ] 实现 `ApplyOrderRepositoryImpl` 的持久化逻辑（save/findById/update）
+- [x] 实现 `ApplyOrderEntity` 的业务方法：create()/approve()/createBatch()/finishInvoice()/sendMail() — 含状态流转校验
+- [x] 实现 `ApplyOrderFactory.createApplyOrder()` — 从 Command 组装完整 Entity
+- [x] 实现 `ApplyOrderRepositoryImpl` 的持久化逻辑（内存Map + Entity↔DO转换）
 - [ ] 实现 `CompanyGatewayImpl` — 调用远程 RPC 查询公司信息
 - [ ] 实现 `MqSenderImpl.send()` — 实际发送 MQ 消息
 
