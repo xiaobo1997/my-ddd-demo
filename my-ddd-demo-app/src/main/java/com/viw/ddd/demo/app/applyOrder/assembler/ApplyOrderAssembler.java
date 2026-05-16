@@ -1,6 +1,8 @@
 package com.viw.ddd.demo.app.applyOrder.assembler;
 
+import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
 import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -32,4 +34,9 @@ public interface ApplyOrderAssembler {
      * 字段名一致时 MapStruct 自动映射，无需额外配置
      */
     SubmitApplyOrderDTO toDTO(SubmitApplyOrderCommand command);
+
+    /**
+     * SendExpressCommand → SendExpressDTO 防腐转换
+     */
+    SendExpressDTO toDTO(SendExpressCommand command);
 }

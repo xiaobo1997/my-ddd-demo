@@ -1,8 +1,8 @@
 package com.viw.ddd.demo.app.applyOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
 import com.viw.ddd.demo.app.applyOrder.convert.ApplyOrderConvert;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.app.applyOrder.event.publish.ApplyOrderSubmittedEvent;
 import com.viw.ddd.demo.app.applyOrder.event.publish.ExpressSentEvent;
@@ -150,9 +150,9 @@ class ApplyOrderServiceImplTest {
         @DisplayName("应依次调用 findById → sendExpress → update → MQ.send")
         void shouldOrchestrateSendExpressFlow() {
             // given
-            SendExpressCommand command = new SendExpressCommand();
-            command.setApplyOrderId(1L);
-            command.setExpressNo("SF1234567890");
+            SendExpressDTO dto = new SendExpressDTO();
+            dto.setApplyOrderId(1L);
+            dto.setExpressNo("SF1234567890");
 
             ApplyOrderEntity entity = ApplyOrderEntity.builder()
                     .id(1L)
@@ -168,7 +168,7 @@ class ApplyOrderServiceImplTest {
             when(applyOrderConvert.convertExpressSentEvent(any())).thenReturn(event);
 
             // when
-            service.sendExpress(command);
+            service.sendExpress(dto);
 
             // then
             InOrder inOrder = inOrder(applyOrderRepository, mqSender, applyOrderConvert);
@@ -181,9 +181,9 @@ class ApplyOrderServiceImplTest {
         @Test
         @DisplayName("update 时应传入旧快照和新实体两个参数")
         void shouldPassOldAndNewEntityToUpdate() {
-            SendExpressCommand command = new SendExpressCommand();
-            command.setApplyOrderId(1L);
-            command.setExpressNo("SF123");
+            SendExpressDTO dto = new SendExpressDTO();
+            dto.setApplyOrderId(1L);
+            dto.setExpressNo("SF123");
 
             ApplyOrderEntity entity = ApplyOrderEntity.builder().id(1L)
                     .status(com.viw.ddd.demo.common.enums.ApplyOrderStatusEnum.SENT_MAIL)
@@ -193,7 +193,7 @@ class ApplyOrderServiceImplTest {
             when(applyOrderConvert.convertExpressSentEvent(any()))
                     .thenReturn(ExpressSentEvent.builder().build());
 
-            service.sendExpress(command);
+            service.sendExpress(dto);
 
             ArgumentCaptor<ApplyOrderEntity> oldCaptor = ArgumentCaptor.forClass(ApplyOrderEntity.class);
             ArgumentCaptor<ApplyOrderEntity> newCaptor = ArgumentCaptor.forClass(ApplyOrderEntity.class);

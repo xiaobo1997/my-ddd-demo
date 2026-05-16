@@ -1,8 +1,8 @@
 package com.viw.ddd.demo.app.applyOrder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
 import com.viw.ddd.demo.app.applyOrder.convert.ApplyOrderConvert;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.app.applyOrder.factory.ApplyOrderFactory;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
@@ -65,15 +65,15 @@ public class ApplyOrderServiceImpl implements ApplyOrderService {
     }
 
     @Override
-    public void sendExpress(SendExpressCommand sendExpressCommand) {
+    public void sendExpress(SendExpressDTO dto) {
         // 1. 查询聚合根
-        ApplyOrderEntity applyOrderEntity = applyOrderRepository.findById(sendExpressCommand.getApplyOrderId());
+        ApplyOrderEntity applyOrderEntity = applyOrderRepository.findById(dto.getApplyOrderId());
 
         // 2. 快照旧实体（用于后续对比变更）
         ApplyOrderEntity oldApplyOrderEntity = ApplyOrderFactory.clone(applyOrderEntity);
 
         // 3. 调用聚合根的领域方法
-        applyOrderEntity.sendExpress(sendExpressCommand.getExpressNo());
+        applyOrderEntity.sendExpress(dto.getExpressNo());
 
         // 4. 保存变更后的聚合根
         applyOrderRepository.update(oldApplyOrderEntity, applyOrderEntity);

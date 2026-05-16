@@ -1,6 +1,6 @@
 package com.viw.ddd.demo.app.applyOrder.service;
 
-import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 
 /**
@@ -23,6 +23,6 @@ public interface ApplyOrderService {
     /** 提交申请单（参数经过防腐层转为 DTO） */
     Long submitApplyOrder(SubmitApplyOrderDTO dto);
 
-    /** 发送快递 */
-    void sendExpress(SendExpressCommand sendExpressCommand);
+    /** 发送快递（参数经过防腐层转为 DTO） */
+    void sendExpress(SendExpressDTO dto);
 }

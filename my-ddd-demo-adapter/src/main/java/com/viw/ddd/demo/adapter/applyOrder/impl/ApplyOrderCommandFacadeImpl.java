@@ -4,6 +4,7 @@ import com.viw.ddd.demo.api.applyOrder.ApplyOrderCommandFacade;
 import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
 import com.viw.ddd.demo.api.applyOrder.dto.SubmitApplyOrderCommand;
 import com.viw.ddd.demo.app.applyOrder.assembler.ApplyOrderAssembler;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.dto.SubmitApplyOrderDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class ApplyOrderCommandFacadeImpl implements ApplyOrderCommandFacade {
 
     @Override
     public void sendExpress(SendExpressCommand command) {
-        applyOrderService.sendExpress(command);
+        // 防腐：Command → DTO
+        SendExpressDTO dto = assembler.toDTO(command);
+        // 转调应用层服务
+        applyOrderService.sendExpress(dto);
     }
 }

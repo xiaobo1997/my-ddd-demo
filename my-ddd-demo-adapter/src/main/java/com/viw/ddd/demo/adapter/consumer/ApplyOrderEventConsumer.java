@@ -1,7 +1,7 @@
 package com.viw.ddd.demo.adapter.consumer;
 
 import com.alibaba.fastjson.JSONObject;
-import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +56,9 @@ public class ApplyOrderEventConsumer {
         Long applyOrderId = msg.getLong("applyOrderId");
 
         // 反序列化后委托给应用层处理
-        SendExpressCommand command = new SendExpressCommand();
-        command.setApplyOrderId(applyOrderId);
-        applyOrderService.sendExpress(command);
+        SendExpressDTO dto = new SendExpressDTO();
+        dto.setApplyOrderId(applyOrderId);
+        applyOrderService.sendExpress(dto);
 
         log.info("[MQ消费者] 消息处理完成: applyOrderId={}", applyOrderId);
     }

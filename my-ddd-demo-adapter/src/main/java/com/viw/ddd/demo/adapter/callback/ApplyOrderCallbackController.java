@@ -1,6 +1,6 @@
 package com.viw.ddd.demo.adapter.callback;
 
-import com.viw.ddd.demo.api.applyOrder.dto.SendExpressCommand;
+import com.viw.ddd.demo.app.applyOrder.dto.SendExpressDTO;
 import com.viw.ddd.demo.app.applyOrder.service.ApplyOrderService;
 import com.viw.ddd.demo.common.dto.Result;
 import org.slf4j.Logger;
@@ -50,9 +50,9 @@ public class ApplyOrderCallbackController {
 
         if (approved) {
             // 审批通过后触发快递寄送（模拟）
-            SendExpressCommand command = new SendExpressCommand();
-            command.setApplyOrderId(applyOrderId);
-            applyOrderService.sendExpress(command);
+            SendExpressDTO dto = new SendExpressDTO();
+            dto.setApplyOrderId(applyOrderId);
+            applyOrderService.sendExpress(dto);
             log.info("[回调] 审批通过，已触发快递寄送: applyOrderId={}", applyOrderId);
         }
 
